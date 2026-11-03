@@ -31,7 +31,7 @@
           requirements: ["plotly", "statsmodels", "scikit-learn", "scipy"],
           entrypoint: "app.py",
           files: {
-            "app.py": { url: "./app.py" },
+            "app.py": { url: "./app.py?t=" + Date.now() },  // 避免瀏覽器快取舊版程式
             "data/flood_train_sample.csv.gz": { url: "./data/flood_train_sample.csv.gz" },
             "data/50_Startups.csv": { url: "./data/50_Startups.csv" },
           },

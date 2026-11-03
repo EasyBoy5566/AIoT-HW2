@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HW2 多元線性回歸｜CRISP-DM</title>
+    <meta name="description" content="AIoT HW2：多元線性回歸 × CRISP-DM 互動網頁（GitHub Pages + stlite，在瀏覽器中執行 Python）" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser@1.12.0/build/stlite.css" />
+    <style>
+      html, body { margin: 0; background: #ffffff; }
+      #notice {
+        font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+        font-size: 14px; color: #44505c; background: #f3f6fa;
+        border-bottom: 1px solid #dde3ea; padding: 8px 16px; text-align: center;
+      }
+      #notice a { color: #2e6fb7; }
+    </style>
+  </head>
+  <body>
+    <div id="notice">
+      第一次開啟需要在瀏覽器下載 Python 執行環境，約需 20～60 秒，請稍候。
+      ｜ <a href="https://github.com/EasyBoy5566/AIoT-HW2" target="_blank" rel="noopener">GitHub repo</a>
+    </div>
+    <div id="root"></div>
+    <script type="module">
+      import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@1.12.0/build/stlite.js";
+
+      mount(
+        {
+          requirements: ["plotly", "statsmodels", "scikit-learn", "scipy"],
+          entrypoint: "app.py",
+          files: {
+            "app.py": { url: "./app.py" },
+            "data/flood_train_sample.csv.gz": { url: "./data/flood_train_sample.csv.gz" },
+            "data/50_Startups.csv": { url: "./data/50_Startups.csv" },
+          },
+          streamlitConfig: {
+            "client.toolbarMode": "viewer",
+            "theme.base": "light",
+          },
+        },
+        document.getElementById("root"),
+      );
+    </script>
+  </body>
+</html>

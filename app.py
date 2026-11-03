@@ -9,7 +9,9 @@ HW2：多元線性回歸 × CRISP-DM 互動網頁
 """
 
 from pathlib import Path
+import io
 import re
+import sys
 import warnings
 
 import numpy as np
@@ -32,6 +34,9 @@ warnings.filterwarnings("ignore")
 st.set_page_config(page_title="HW2 多元線性回歸｜CRISP-DM", page_icon="📈", layout="wide")
 
 BASE = Path(__file__).parent
+IS_BROWSER = sys.platform == "emscripten"  # GitHub Pages 版本（stlite / Pyodide，在瀏覽器執行 Python）
+BROWSER_FLOOD_ROWS = 20000                  # 瀏覽器運算較慢，洪水資料再抽樣 20,000 筆
+PAGES_URL = "https://easyboy5566.github.io/AIoT-HW2/"
 REPO = "https://github.com/EasyBoy5566/AIoT-HW2"
 STARTUPS_URL = "https://raw.githubusercontent.com/Avik-Jain/100-Days-Of-ML-Code/master/datasets/50_Startups.csv"
 ACCENT = "#2E6FB7"
@@ -99,17 +104,28 @@ def load_local(path: str) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
+def fetch_text(url: str) -> str:
+    """下載 CSV 文字：本機／Streamlit Cloud 用 urllib，瀏覽器版用 pyodide.http.open_url"""
+    if IS_BROWSER:
+        from pyodide.http import open_url  # type: ignore
+        return open_url(url).read()
+    import urllib.request
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        return resp.read().decode("utf-8-sig", errors="replace")
+
+
 @st.cache_data(show_spinner="下載資料中…", ttl=3600)
 def load_url(url: str) -> pd.DataFrame:
-    df = pd.read_csv(url)
+    text = fetch_text(url)
+    df = pd.read_csv(io.StringIO(text))
     if df.shape[1] == 1:  # 可能是分號或 tab 分隔
-        df = pd.read_csv(url, sep=None, engine="python")
+        df = pd.read_csv(io.StringIO(text), sep=None, engine="python")
     return df
 
 
 @st.cache_data(show_spinner=False)
 def load_upload(content: bytes) -> pd.DataFrame:
-    import io
     df = pd.read_csv(io.BytesIO(content))
     if df.shape[1] == 1:
         df = pd.read_csv(io.BytesIO(content), sep=None, engine="python")
@@ -264,7 +280,10 @@ if cfg is None:
             df = load_url(raw)
             src_name, src_link = raw.rsplit("/", 1)[-1], raw
     except Exception as e:  # noqa: BLE001
-        st.error(f"無法讀取資料：{e}")
+        msg = f"無法讀取資料：{e}"
+        if IS_BROWSER:
+            msg += "\n\n網頁版在瀏覽器中執行，只能讀取允許跨網域存取（CORS）的網址，例如 raw.githubusercontent.com；也可以改用上方的「上傳 CSV」。"
+        st.error(msg)
         st.stop()
     numeric_cols = [c for c in df.columns if pd.api.types.is_numeric_dtype(df[c])]
     if not numeric_cols:
@@ -278,6 +297,9 @@ if cfg is None:
                         "**成功標準**：測試集 R² 越高、RMSE 越低越好，並找出對目標影響最大的特徵。"]}
 else:
     df = load_local(str(cfg["path"]))
+    if IS_BROWSER and cfg["key"] == "flood" and len(df) > BROWSER_FLOOD_ROWS:
+        df = df.sample(n=BROWSER_FLOOD_ROWS, random_state=42).sort_index()
+        cfg = {**cfg, "note": cfg["note"].replace("50,000 筆", f"50,000 筆，瀏覽器版再抽樣 {BROWSER_FLOOD_ROWS:,} 筆")}
     target = cfg["target"]
 
 id_guess = [c for c in guess_id_columns(df) if c != target]
@@ -290,6 +312,8 @@ fs_choice = st.sidebar.selectbox("特徵選擇方法", ["自動推薦（1-SE 規
 final_model_name = st.sidebar.selectbox("最終模型", ["LinearRegression", "Ridge", "Lasso"])
 st.sidebar.divider()
 st.sidebar.markdown(f"[GitHub repo]({REPO})　·　學號 5115056015")
+if IS_BROWSER:
+    st.sidebar.caption("GitHub Pages 版本：Python 在你的瀏覽器中執行（stlite），切換資料集時需要等待數秒～數十秒。")
 
 # ------------------------------------------------------------------
 # 資料準備

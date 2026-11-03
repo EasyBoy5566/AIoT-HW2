@@ -4,7 +4,8 @@
 
 | 連結 | 網址 |
 |---|---|
-| 🌐 **Web（Streamlit）** | **https://aiot-hw2-5115056015.streamlit.app** |
+| 🌐 **Web（GitHub Pages）** | **https://easyboy5566.github.io/AIoT-HW2/** |
+| 🌐 Web 備用（Streamlit Cloud） | https://aiot-hw2-5115056015.streamlit.app |
 | 💻 GitHub | https://github.com/EasyBoy5566/AIoT-HW2 |
 | 📓 Colab Notebook | https://colab.research.google.com/drive/10A_C9AQGlzaIKCIm9_LQPGAfKkzCIAzJ?usp=sharing |
 | 📊 Kaggle 資料集 | https://www.kaggle.com/competitions/playground-series-s4e5 |
@@ -104,6 +105,7 @@ Problem 2（50 Startups）：1-SE 規則只選出 `R&D Spend` 一個特徵，測
 
 ```
 AIoT-HW2/
+├── index.html                      # GitHub Pages 入口（stlite 在瀏覽器執行 app.py）
 ├── app.py                          # Streamlit 網頁（主要繳交）
 ├── requirements.txt
 ├── 5115056015_hw2.ipynb            # Colab 主程式（完整 111 萬筆資料，含所有輸出）
@@ -118,6 +120,11 @@ AIoT-HW2/
 │   └── NotebookLM_summary.pdf      # NotebookLM 研究摘要
 └── images/                         # README 截圖
 ```
+
+## 網頁部署方式
+
+- **GitHub Pages**：`index.html` 使用 [stlite](https://github.com/whitphx/stlite)（Pyodide）在瀏覽器中執行同一份 `app.py`，不需要伺服器。第一次開啟需下載 Python 執行環境（約 20～60 秒）；瀏覽器版的洪水資料再抽樣為 20,000 筆以加快運算；自訂 Dataset 只能讀取允許跨網域存取（CORS）的網址，例如 `raw.githubusercontent.com`，也可直接上傳 CSV。
+- **Streamlit Cloud（備用）**：在 share.streamlit.io 以本 repo 的 `app.py` 部署。
 
 ## 本機執行
 

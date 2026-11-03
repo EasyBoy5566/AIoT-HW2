@@ -1,47 +1,267 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>HW2 多元線性回歸｜CRISP-DM</title>
-    <meta name="description" content="AIoT HW2：多元線性回歸 × CRISP-DM 互動網頁（GitHub Pages + stlite，在瀏覽器中執行 Python）" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser@1.12.0/build/stlite.css" />
-    <style>
-      html, body { margin: 0; background: #ffffff; }
-      #notice {
-        font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
-        font-size: 14px; color: #44505c; background: #f3f6fa;
-        border-bottom: 1px solid #dde3ea; padding: 8px 16px; text-align: center;
-      }
-      #notice a { color: #2e6fb7; }
-    </style>
-  </head>
-  <body>
-    <div id="notice">
-      第一次開啟需要在瀏覽器下載 Python 執行環境，約需 20～60 秒，請稍候。
-      ｜ <a href="https://github.com/EasyBoy5566/AIoT-HW2" target="_blank" rel="noopener">GitHub repo</a>
-    </div>
-    <div id="root"></div>
-    <script type="module">
-      import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@1.12.0/build/stlite.js";
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HW2｜多元線性回歸 × CRISP-DM</title>
+<meta name="description" content="AIoT HW2：多元線性回歸 × CRISP-DM 互動網頁（純 JavaScript，在瀏覽器即時計算）">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+<script src="vendor/papaparse.min.js"></script>
+<script src="vendor/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f3f6f9;--card:#fff;--ink:#182f41;--muted:#607587;--line:#e0e8ef;--primary:#087f83;--primary2:#06666a;--ok:#087956;--bad:#b42318;--blue:#2e6fb7;--orange:#e8833a}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);line-height:1.65;letter-spacing:.015em}
+a{color:var(--primary)}
+header{position:relative;overflow:hidden;background:radial-gradient(ellipse at 90% 10%,#24636b 0,transparent 55%),linear-gradient(120deg,#112b3c,#183e4e);color:#fff;padding:26px 28px 52px}
+header::after{content:"";position:absolute;width:360px;height:360px;border:1px solid #ffffff12;border-radius:50%;right:-90px;top:60px;box-shadow:0 0 0 55px #ffffff03,0 0 0 110px #ffffff03;pointer-events:none}
+.wrap{max-width:1200px;margin:auto}
+.brand{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:650;margin-bottom:30px;color:#dfedef}
+.brand-icon{display:grid;place-items:center;background:#76e2cd;color:#123c43;width:32px;height:32px;border-radius:10px;font-size:20px}
+.brand a{color:#bfe9e2;margin-left:auto;font-weight:500}
+.eyebrow{font-size:12px;letter-spacing:.18em;color:#8adacb;margin-bottom:12px}
+h1{font-size:clamp(26px,3.4vw,40px);font-weight:750;line-height:1.35;margin:0 0 14px}
+.sub{color:#bcd0da;max-width:760px;font-size:15px;line-height:1.9;margin:0}
+.hero-tags{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.hero-tags span{border:1px solid #ffffff25;border-radius:6px;padding:5px 11px;color:#daeae9;font-size:12px;background:#ffffff05}
+main{max-width:1200px;margin:auto;padding:0 24px 40px}
+.card{background:var(--card);border:1px solid #e2e9ee;border-radius:16px;padding:24px;margin-bottom:22px;box-shadow:0 4px 20px #19384906}
+.setup{margin-top:-30px;position:relative;border-top:3px solid #0c9695}
+h2{display:flex;align-items:center;gap:12px;font-size:19px;margin:0 0 18px;letter-spacing:.03em}
+h3{font-size:16px;margin:22px 0 10px}
+.section-number{font-size:12px;color:var(--primary);background:#e9f6f3;border:1px solid #cee9e2;border-radius:7px;padding:3px 8px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;align-items:end}
+.grid>*{min-width:0}
+.c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+@media(max-width:900px){.c2,.c3,.c4,.c5,.c6,.c7,.c8{grid-column:span 12}}
+label{display:block;font-size:13px;font-weight:700;color:#476071;margin-bottom:7px}
+input,select,button{width:100%;min-height:44px;padding:9px 11px;border:1px solid #d9e3eb;border-radius:9px;background:#fafcfd;font:inherit;font-size:14px;color:var(--ink)}
+input[type=file]{padding:6px;font-size:12px}
+input[type=range]{padding:0;min-height:30px;accent-color:var(--primary)}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid #77cfc7;outline-offset:2px}
+button{background:var(--primary);border:0;color:#fff;font-weight:700;cursor:pointer}
+button:hover:not(:disabled){background:var(--primary2)}
+button.secondary{background:#eaf4f4;color:#096a70;border:1px solid #c9e2e2}
+button:disabled{opacity:.5;cursor:not-allowed}
+.status{font-size:13px;background:#eff5f8;color:#456777;padding:12px 16px;margin-top:18px;border-left:3px solid #adc7d5;border-radius:8px;white-space:pre-wrap}
+.status.ok{border-left-color:#31a37c;background:#eff9f4;color:#05603a}
+.status.bad{border-left-color:#d85b53;background:#fff1f0;color:#8f241c}
+.status.busy{border-left-color:#e8b33a;background:#fffaf0;color:#7a5a12}
+.hint{font-size:13px;color:var(--muted)}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.check{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:8px;padding:5px 9px;font-size:13px;background:#fafcfd}
+.check input{width:auto;min-height:0}
+.kpi-row{display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 18px}
+.kpi{flex:1 1 160px;min-width:150px;background:#f8fbfc;border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.kpi .lab{font-size:12.5px;color:var(--muted)}
+.kpi .val{font-size:24px;font-weight:750;white-space:nowrap}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:2px solid var(--line);margin-bottom:20px}
+.tab{width:auto;min-height:0;background:none;color:#476071;border:0;border-bottom:3px solid transparent;border-radius:0;padding:10px 14px;margin-bottom:-2px;font-weight:650}
+.tab:hover:not(:disabled){background:#eef6f6}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.panel{display:none}.panel.active{display:block}
+.tablewrap{overflow:auto;max-height:520px;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:8px 10px;border-bottom:1px solid #e7edf3;text-align:left;vertical-align:top;white-space:nowrap}
+td.wrap,th.wrap{white-space:normal}
+th{position:sticky;top:0;background:#f5f9fa;z-index:1;font-weight:700;color:#355064}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.rec td{background:#ecf8f5;font-weight:700}
+.chartbox{position:relative;height:380px}
+.chartbox.tall{height:460px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}.two>*{min-width:0}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{padding:3px 9px;border-radius:999px;background:#eef2f7;border:1px solid #dce3eb;font-size:12px}
+.note{background:#f3f9f9;border:1px solid #d7ebea;border-radius:10px;padding:12px 16px;font-size:14px}
+.callout{background:#ecf8f5;border-left:4px solid var(--primary);border-radius:8px;padding:12px 16px;margin:14px 0;font-size:14px}
+ul.clean{margin:0;padding-left:20px}ul.clean li{margin:6px 0}
+.heat td{width:auto;text-align:center;font-size:11px;padding:4px 3px;color:#14212b}
+.heat th{font-size:11px;padding:4px 6px}
+.heat th.rowh{position:sticky;left:0;background:#f5f9fa;z-index:2;text-align:right}
+.workflow{display:grid;grid-template-columns:repeat(6,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:14px}
+.step{border-right:1px solid var(--line);padding:14px 8px;background:#fafcfd;font-size:13px;color:#476071;text-align:center}
+.step:last-child{border-right:0}.step b{display:block;font-size:14px;color:var(--ink)}
+@media(max-width:800px){.workflow{grid-template-columns:repeat(2,1fr)}.step{border-bottom:1px solid var(--line)}}
+.predict-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+img.full{max-width:100%;border:1px solid var(--line);border-radius:12px}
+footer{text-align:center;font-size:13px;color:var(--muted);padding:10px 0 30px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand"><span class="brand-icon">📈</span>AIoT HW2 <span style="opacity:.35">／</span> 學號 5115056015 鍾易憲
+      <a href="https://github.com/EasyBoy5566/AIoT-HW2" target="_blank" rel="noopener">GitHub repo ↗</a></div>
+    <div class="eyebrow">MULTIPLE LINEAR REGRESSION × CRISP-DM</div>
+    <h1>多元線性回歸分析室</h1>
+    <p class="sub">用下拉選單切換兩種 problem，或貼上任意 CSV 網址；網頁會在瀏覽器中即時完成資料理解、前處理、特徵選擇、建模、95% 信賴區間／預測區間評估與即時預測。</p>
+    <div class="hero-tags"><span>Kaggle S4E5 洪水預測（20 特徵）</span><span>50 Startups</span><span>SelectKBest／RFE／LassoCV</span><span>LinearRegression／Ridge／Lasso／OLS</span></div>
+  </div>
+</header>
 
-      mount(
-        {
-          requirements: ["plotly", "statsmodels", "scikit-learn", "scipy"],
-          entrypoint: "app.py",
-          files: {
-            "app.py": { url: "./app.py?t=" + Date.now() },  // 避免瀏覽器快取舊版程式
-            "data/flood_train_sample.csv.gz": { url: "./data/flood_train_sample.csv.gz" },
-            "data/50_Startups.csv": { url: "./data/50_Startups.csv" },
-          },
-          streamlitConfig: {
-            "client.toolbarMode": "viewer",
-            "theme.base": "light",
-          },
-        },
-        document.getElementById("root"),
-      );
-    </script>
-  </body>
+<main>
+  <section class="card setup">
+    <h2><span class="section-number">設定</span>資料與模型</h2>
+    <div class="grid">
+      <div class="c4">
+        <label for="problem">選擇 Problem / Dataset</label>
+        <select id="problem">
+          <option value="flood">Problem 1：洪水機率預測（Kaggle S4E5）</option>
+          <option value="startups">Problem 2：新創公司利潤預測（50 Startups）</option>
+          <option value="custom">自訂 Dataset（輸入 CSV 網址或上傳）</option>
+        </select>
+      </div>
+      <div class="c3"><label for="target">目標欄位（y）</label><select id="target"></select></div>
+      <div class="c2"><label for="testSize">測試集比例：<span id="testSizeVal">0.20</span></label><input id="testSize" type="range" min="0.1" max="0.4" step="0.05" value="0.2"></div>
+      <div class="c3"><label for="seed">random_state</label><input id="seed" type="number" value="42" step="1"></div>
+    </div>
+    <div id="customBox" class="grid hidden" style="margin-top:16px">
+      <div class="c6"><label for="url">CSV 網址（支援 raw.githubusercontent.com 與 GitHub 網頁連結）</label>
+        <input id="url" type="url" value="https://raw.githubusercontent.com/Avik-Jain/100-Days-Of-ML-Code/master/datasets/50_Startups.csv"></div>
+      <div class="c2"><button id="loadUrl" class="secondary">從網址載入</button></div>
+      <div class="c4"><label for="file">或上傳本機 CSV</label><input id="file" type="file" accept=".csv,text/csv"></div>
+    </div>
+    <div class="grid" style="margin-top:16px">
+      <div class="c4"><label for="fsMethod">特徵選擇方法</label>
+        <select id="fsMethod">
+          <option value="auto">自動推薦（1-SE 規則）</option>
+          <option value="SelectKBest">SelectKBest（f_regression）</option>
+          <option value="RFE">RFE（LinearRegression）</option>
+          <option value="LassoCV">LassoCV</option>
+          <option value="all">全部特徵</option>
+        </select></div>
+      <div class="c4" id="kBox"><label for="k">選取特徵數 k：<span id="kVal">—</span></label><input id="k" type="range" min="1" max="20" step="1" value="20" disabled></div>
+      <div class="c4"><label for="finalModel">最終模型</label>
+        <select id="finalModel"><option>LinearRegression</option><option>Ridge</option><option>Lasso</option></select></div>
+    </div>
+    <details id="excludeBox" style="margin-top:16px"><summary id="excludeSummary" style="cursor:pointer;font-size:13px;font-weight:700;color:#476071">排除的欄位（ID 等）</summary><div id="exclude" class="checks" style="margin-top:10px"></div></details>
+    <div id="status" class="status">載入中…</div>
+  </section>
+
+  <section class="card" id="resultCard">
+    <div id="datasetInfo" class="hint" style="margin-bottom:10px"></div>
+    <div id="kpis" class="kpi-row"></div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="t1">1 Business Understanding</button>
+      <button class="tab" data-tab="t2">2 Data Understanding</button>
+      <button class="tab" data-tab="t3">3 Data Preparation</button>
+      <button class="tab" data-tab="t4">4 Modeling</button>
+      <button class="tab" data-tab="t5">5 Evaluation</button>
+      <button class="tab" data-tab="t6">6 Deployment</button>
+      <button class="tab" data-tab="t7">7 網路解法與 AI 輔助</button>
+    </nav>
+
+    <div class="panel active" id="t1">
+      <h3>Business Understanding</h3>
+      <ul class="clean" id="business"></ul>
+      <div class="workflow">
+        <div class="step"><b>1 Business</b>定義問題與價值</div>
+        <div class="step"><b>2 Data</b>資料品質與相關性</div>
+        <div class="step"><b>3 Preparation</b>清理、切分、編碼</div>
+        <div class="step"><b>4 Modeling</b>特徵選擇 + 回歸</div>
+        <div class="step"><b>5 Evaluation</b>指標、區間、診斷</div>
+        <div class="step"><b>6 Deployment</b>即時預測</div>
+      </div>
+    </div>
+
+    <div class="panel" id="t2">
+      <div id="duKpis" class="kpi-row"></div>
+      <h3>前 10 筆資料</h3><div class="tablewrap" id="headTable"></div>
+      <div class="two">
+        <div><h3>欄位資訊</h3><div class="tablewrap" id="infoTable"></div></div>
+        <div><h3>描述統計</h3><div class="tablewrap" id="descTable"></div></div>
+      </div>
+      <div class="two">
+        <div><h3 id="histTitle">目標變數分布</h3><div class="chartbox"><canvas id="histChart"></canvas></div></div>
+        <div><h3 id="corrTitle">各特徵與目標的相關係數</h3><div class="chartbox tall" id="corrBox"><canvas id="corrChart"></canvas></div></div>
+      </div>
+      <h3>相關係數熱力圖（Pearson，訓練集）</h3><div class="tablewrap" id="heatmap"></div>
+    </div>
+
+    <div class="panel" id="t3">
+      <h3>Data Preparation</h3>
+      <div class="tablewrap" id="prepTable"></div>
+      <h3>編碼後特徵</h3><div class="pills" id="encodedFeats"></div>
+    </div>
+
+    <div class="panel" id="t4">
+      <h3>4.1 Feature Selection：三種方法 × 不同特徵數的 CV R²</h3>
+      <div class="chartbox"><canvas id="fsChart"></canvas></div>
+      <div id="fsCallout" class="callout"></div>
+      <div class="tablewrap" id="fsTable"></div>
+      <h3>4.2 模型建立：LinearRegression／Ridge／Lasso／OLS</h3>
+      <div class="tablewrap" id="modelTable"></div>
+      <div class="two">
+        <div><h3 id="olsTitle">OLS 係數</h3><div class="tablewrap" id="coefTable"></div></div>
+        <div><h3>標準化係數（特徵增加 1 個標準差的影響）</h3><div class="chartbox tall" id="coefBox"><canvas id="coefChart"></canvas></div></div>
+      </div>
+      <div id="coefNote" class="note" style="margin-top:12px"></div>
+    </div>
+
+    <div class="panel" id="t5">
+      <h3>5.1 測試集評估指標</h3>
+      <div id="evalKpis" class="kpi-row"></div>
+      <h3>5.2 預測圖：95% 信賴區間與預測區間</h3>
+      <div class="grid" style="margin-bottom:8px"><div class="c4"><label for="nShow">顯示的測試樣本數：<span id="nShowVal">100</span></label><input id="nShow" type="range" min="10" max="300" step="10" value="100"></div></div>
+      <div class="chartbox tall"><canvas id="piChart"></canvas></div>
+      <p class="hint" id="piNote"></p>
+      <div class="two">
+        <div><h3 id="avpTitle">實際值 vs 預測值</h3><div class="chartbox"><canvas id="avpChart"></canvas></div></div>
+        <div><h3>殘差 vs 預測值</h3><div class="chartbox"><canvas id="rvfChart"></canvas></div></div>
+      </div>
+      <h3>5.3 殘差診斷與五大回歸假設</h3>
+      <div class="two">
+        <div><div class="chartbox"><canvas id="residHist"></canvas></div></div>
+        <div><div class="chartbox"><canvas id="qqChart"></canvas></div></div>
+      </div>
+      <div class="two">
+        <div class="tablewrap" id="diagTable"></div>
+        <div class="tablewrap" id="vifTable"></div>
+      </div>
+    </div>
+
+    <div class="panel" id="t6">
+      <h3>Deployment：輸入特徵值，即時預測</h3>
+      <p class="hint">預設值為訓練集的中位數／眾數；修改任一欄位會立即重新預測。95% 區間由 OLS 模型（選用特徵）計算。</p>
+      <div class="predict-grid" id="predictForm"></div>
+      <div id="predictOut" class="kpi-row" style="margin-top:16px"></div>
+      <button id="download" class="secondary" style="width:auto;padding:10px 18px">下載測試集預測結果（CSV）</button>
+      <p class="note" style="margin-top:16px"><b>部署方式</b>：本網頁為純 HTML + JavaScript，部署於 GitHub Pages，所有運算都在使用者的瀏覽器中完成；模型也可以用 Notebook 中的 joblib 檔包成 FastAPI／Flask API，或以批次排程對新資料定期預測。</p>
+    </div>
+
+    <div class="panel" id="t7">
+      <h3>網路主流解法比較（Kaggle S4E5）</h3>
+      <div class="tablewrap"><table>
+        <tr><th>方法</th><th>代表成績</th><th>優點</th><th>限制</th></tr>
+        <tr class="rec"><td class="wrap">本研究：20 特徵多元線性回歸（Ridge／OLS）</td><td class="wrap">測試 R² 0.8449；Kaggle Private 0.84426</td><td class="wrap">訓練快、係數可解釋</td><td class="wrap">無法捕捉非線性與交互作用</td></tr>
+        <tr><td class="wrap">特徵加總 feature_sum + 線性回歸</td><td class="wrap">測試 R² 0.8449（只用 1 個特徵）</td><td class="wrap">證實目標主要由 20 特徵總和決定</td><td class="wrap">與原始特徵同時使用會完全共線</td></tr>
+        <tr><td class="wrap">列統計特徵（sum／mean／std／skew…）</td><td class="wrap">Kaggle 高分討論核心技巧</td><td class="wrap">提供分布形狀與非線性資訊</td><td class="wrap">特徵冗餘，需交叉驗證確認增益</td></tr>
+        <tr><td class="wrap">LightGBM／CatBoost + 統計特徵</td><td class="wrap">CV R² 約 0.869～0.870</td><td class="wrap">可學習非線性與局部交互作用</td><td class="wrap">需調參、可解釋性較低</td></tr>
+        <tr><td class="wrap">Ensemble／Blending（第 2 名解法）</td><td class="wrap">Public 0.86943／Private 0.86902</td><td class="wrap">降低單一模型誤差</td><td class="wrap">模型繁多，訓練與維護成本高</td></tr>
+      </table></div>
+      <p>Kaggle 公開分析指出目標值近似由 20 個特徵的總和決定，所以線性回歸已能抓到主要訊號；高分解法再加入列統計特徵，用梯度提升樹學習剩下的非線性部分，R² 由約 0.845 提升到約 0.869。</p>
+      <h3>NotebookLM 摘要</h3>
+      <p class="note">參賽者主要使用梯度提升樹模型（CatBoost、LightGBM、XGBoost），並結合線性模型（Linear Regression、Ridge）與模型融合（Blending／Ensemble）提升表現。特徵工程是拿高分的關鍵，最核心的做法是跨特徵的列統計量，例如每筆資料 20 個特徵的總和、平均值、標準差、中位數、偏度與熵。加入進階列統計特徵後，CatBoost 單模 CV R² 達 0.87003，LightGBM 約 0.86931。線性回歸的優點是訓練極快，只用特徵總和就能得到約 0.844～0.846 的基準分數；缺點是無法捕捉非線性與特徵交互作用，因此上限受限。</p>
+      <p class="hint">由 NotebookLM 根據 7 個網路來源（Kaggle 競賽頁、討論區與高分 Notebook）產生。</p>
+      <h3>GPT 輔助內容</h3>
+      <p>本作業使用 ChatGPT 依 CRISP-DM 各階段協助撰寫 Colab 程式（EDA、前處理、特徵選擇、模型、預測區間、殘差診斷、部署）與整理網路解法；所有數值皆為實際執行的結果。本網頁程式由 AI 協助撰寫，回歸運算已與 Python（scikit-learn／statsmodels）結果逐項核對。</p>
+      <ul class="clean">
+        <li><a href="docs/GPT_conversation.pdf" target="_blank" rel="noopener">ChatGPT 對話紀錄（PDF）</a></li>
+        <li><a href="docs/NotebookLM_summary.pdf" target="_blank" rel="noopener">NotebookLM 研究摘要（PDF）</a></li>
+        <li><a href="docs/5115056015_hw2_report.pdf" target="_blank" rel="noopener">完整報告（PDF）</a></li>
+        <li><a href="https://github.com/EasyBoy5566/AIoT-HW2/blob/main/5115056015_hw2.ipynb" target="_blank" rel="noopener">Colab Notebook（完整 111 萬筆資料）</a></li>
+      </ul>
+      <h3>資訊圖表</h3>
+      <img class="full" src="images/infographic.png" alt="HW2 資訊圖表" loading="lazy">
+    </div>
+  </section>
+  <footer>HW2 多元線性回歸 × CRISP-DM ｜ 學號 5115056015 鍾易憲 ｜ <a href="https://github.com/EasyBoy5566/AIoT-HW2">GitHub</a></footer>
+</main>
+
+<script src="js/stats.js"></script>
+<script src="js/analysis.js"></script>
+<script src="js/app.js"></script>
+</body>
 </html>

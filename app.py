@@ -592,7 +592,7 @@ with tabs[4]:
     bp_p = het_breuschpagan(np.asarray(ols.resid)[bp_idx], ols.model.exog[bp_idx])[1]
     diag = pd.DataFrame([
         ["線性", "殘差 vs 預測值", "殘差應隨機分布在 0 附近、無明顯曲線"],
-        ["殘差平均為 0", f"{resid.mean():.6g}", "接近 0 ✓" if abs(resid.mean()) < 2 * resid.std(ddof=1) / np.sqrt(len(resid)) else "偏離 0（超過 2 個標準誤）"],
+        ["殘差平均為 0", f"{resid.mean():.6g}", "接近 0 ✓" if (abs(resid.mean()) < 2 * resid.std(ddof=1) / np.sqrt(len(resid)) or abs(resid.mean()) < 0.05 * resid.std(ddof=1)) else "偏離 0（超過 2 個標準誤且大於殘差標準差的 5%）"],
         ["常態性", f"偏態 {sk:.3f}、超額峰度 {ku:.3f}", "接近常態 ✓" if abs(sk) < 1 and abs(ku) < 3 else "偏離常態，需留意"],
         ["誤差獨立", f"Durbin-Watson = {dw:.3f}", "約 2 表示無自相關 ✓" if 1.5 < dw < 2.5 else "可能有自相關"],
         ["變異數同質（等變異性）", f"Breusch-Pagan p-value = {bp_p:.3g}",

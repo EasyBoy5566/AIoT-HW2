@@ -33,11 +33,24 @@ warnings.filterwarnings("ignore")
 
 st.set_page_config(page_title="HW2 多元線性回歸｜CRISP-DM", page_icon="📈", layout="wide")
 st.markdown(
-    "<style>[data-testid='stMetricValue']{font-size:1.55rem;}"
-    "[data-testid='stMetricValue'] > div{overflow:visible;text-overflow:clip;white-space:nowrap;}"
-    "[data-testid='stMetricLabel'] p{font-size:0.85rem;}</style>",
+    """<style>
+    .kpi-row{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 14px 0;}
+    .kpi{flex:1 1 150px;min-width:140px;background:#f5f8fc;border:1px solid #e1e8f0;border-radius:10px;padding:10px 14px;}
+    .kpi .lab{font-size:0.82rem;color:#55606b;margin-bottom:2px;}
+    .kpi .val{font-size:1.45rem;font-weight:600;color:#1f2d3d;white-space:nowrap;}
+    </style>""",
     unsafe_allow_html=True,
 )
+
+
+def kpi_row(items):
+    """以可自動換行的卡片顯示指標，避免窄螢幕時數字被截斷"""
+    import html
+    cards = "".join(
+        f"<div class='kpi'><div class='lab'>{html.escape(str(k))}</div><div class='val'>{html.escape(str(v))}</div></div>"
+        for k, v in items
+    )
+    st.markdown(f"<div class='kpi-row'>{cards}</div>", unsafe_allow_html=True)
 
 BASE = Path(__file__).parent
 IS_BROWSER = sys.platform == "emscripten"  # GitHub Pages 版本（stlite / Pyodide，在瀏覽器執行 Python）
@@ -377,12 +390,13 @@ link_md = f"[{cfg['name']}]({cfg['link']})" if cfg.get("link") else cfg["name"]
 st.markdown(f"**Dataset**：{link_md}　｜　**目標**：`{target}`")
 st.caption(cfg["note"])
 
-c1, c2, c3, c4, c5 = st.columns(5)
-c1.metric("資料筆數", f"{len(data):,}")
-c2.metric("原始特徵數", f"{X_raw.shape[1]}")
-c3.metric("選用特徵數", f"{len(feats)} / {Xtr.shape[1]}")
-c4.metric(f"測試 R²（{final_model_name}）", f"{final_metrics['R²']:.4f}")
-c5.metric("95% PI 涵蓋率", f"{coverage:.1%}")
+kpi_row([
+    ("資料筆數", f"{len(data):,}"),
+    ("原始特徵數", f"{X_raw.shape[1]}"),
+    ("選用特徵數", f"{len(feats)} / {Xtr.shape[1]}"),
+    (f"測試 R²（{final_model_name}）", f"{final_metrics['R²']:.4f}"),
+    ("95% PI 涵蓋率", f"{coverage:.1%}"),
+])
 
 tabs = st.tabs(["1 Business Understanding", "2 Data Understanding", "3 Data Preparation",
                 "4 Modeling", "5 Evaluation", "6 Deployment", "7 網路解法與 AI 輔助"])
@@ -499,12 +513,13 @@ with tabs[3]:
 # ---------------- 5 Evaluation ----------------
 with tabs[4]:
     st.subheader("5.1 測試集評估指標")
-    m1, m2, m3, m4, m5 = st.columns(5)
-    m1.metric("MAE", fmt(final_metrics["MAE"], 6))
-    m2.metric("MSE", fmt(final_metrics["MSE"], 6))
-    m3.metric("RMSE", fmt(final_metrics["RMSE"], 6))
-    m4.metric("R²", f"{final_metrics['R²']:.4f}")
-    m5.metric("Adjusted R²", f"{final_metrics['Adjusted R²']:.4f}")
+    kpi_row([
+        ("MAE", fmt(final_metrics["MAE"], 6)),
+        ("MSE", fmt(final_metrics["MSE"], 6)),
+        ("RMSE", fmt(final_metrics["RMSE"], 6)),
+        ("R²", f"{final_metrics['R²']:.4f}"),
+        ("Adjusted R²", f"{final_metrics['Adjusted R²']:.4f}"),
+    ])
 
     rng = np.random.default_rng(seed)
     st.subheader("5.2 預測圖：95% 信賴區間與預測區間")
@@ -606,11 +621,12 @@ with tabs[5]:
         row = sm.add_constant(one[feats], has_constant="add")
         pf = ols.get_prediction(row).summary_frame(alpha=0.05).iloc[0]
         model_pred = model_pipes[final_model_name].predict(one[feats])[0]
-        r0, r1, r2_, r3 = st.columns(4)
-        r0.metric(f"{final_model_name} 預測值", fmt(model_pred, 6))
-        r1.metric("OLS 預測值", fmt(pf["mean"], 6))
-        r2_.metric("95% 信賴區間", f"{fmt(pf['mean_ci_lower'], 4)} ~ {fmt(pf['mean_ci_upper'], 4)}")
-        r3.metric("95% 預測區間", f"{fmt(pf['obs_ci_lower'], 4)} ~ {fmt(pf['obs_ci_upper'], 4)}")
+        kpi_row([
+            (f"{final_model_name} 預測值", fmt(model_pred, 6)),
+            ("OLS 預測值", fmt(pf["mean"], 6)),
+            ("95% 信賴區間", f"{fmt(pf['mean_ci_lower'], 4)} ~ {fmt(pf['mean_ci_upper'], 4)}"),
+            ("95% 預測區間", f"{fmt(pf['obs_ci_lower'], 4)} ~ {fmt(pf['obs_ci_upper'], 4)}"),
+        ])
 
     out = Xte_raw.copy()
     out[f"Actual_{target}"] = yte.values

@@ -32,6 +32,12 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 warnings.filterwarnings("ignore")
 
 st.set_page_config(page_title="HW2 多元線性回歸｜CRISP-DM", page_icon="📈", layout="wide")
+st.markdown(
+    "<style>[data-testid='stMetricValue']{font-size:1.55rem;}"
+    "[data-testid='stMetricValue'] > div{overflow:visible;text-overflow:clip;white-space:nowrap;}"
+    "[data-testid='stMetricLabel'] p{font-size:0.85rem;}</style>",
+    unsafe_allow_html=True,
+)
 
 BASE = Path(__file__).parent
 IS_BROWSER = sys.platform == "emscripten"  # GitHub Pages 版本（stlite / Pyodide，在瀏覽器執行 Python）

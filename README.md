@@ -123,6 +123,8 @@ Problem 2（50 Startups）：1-SE 規則只選出 `R&D Spend` 一個特徵，測
 
 使用 ChatGPT 依 CRISP-DM 各階段協助撰寫 Colab 程式與整理網路解法，所有數值皆為實際執行結果；網頁程式（`index.html`、`js/`）與 Python 版 `app.py` 由 AI 協助撰寫，網頁的回歸運算已與 scikit-learn／statsmodels 逐項核對。完整對話紀錄：[docs/GPT_conversation.pdf](docs/GPT_conversation.pdf)
 
+另使用 Claude 協助規劃作業步驟、修正 Notebook、整理報告與製作互動網頁，對話紀錄：[docs/claude_conversation.pdf](docs/claude_conversation.pdf)
+
 ---
 
 ## 檔案結構
@@ -146,7 +148,10 @@ AIoT-HW2/
 ├── docs/
 │   ├── 5115056015_hw2_report.pdf   # 完整報告（含 GPT 對話附錄）
 │   ├── GPT_conversation.pdf        # ChatGPT 對話紀錄
+│   ├── claude_conversation.pdf     # Claude 對話紀錄
 │   └── NotebookLM_summary.pdf      # NotebookLM 研究摘要
+├── results/
+│   └── submission.csv              # Kaggle 提交檔（僅 zip 內附，未上傳 GitHub）
 └── images/                         # 資訊圖表與 README 截圖
 ```
 

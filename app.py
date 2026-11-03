@@ -565,7 +565,7 @@ with tabs[4]:
         fig.update_layout(title="殘差 vs 預測值", xaxis_title="預測值", yaxis_title="殘差", height=450, showlegend=False)
         st.plotly_chart(fig)
 
-    st.subheader("5.3 殘差診斷與回歸假設")
+    st.subheader("5.3 殘差診斷與五大回歸假設")
     g3, g4 = st.columns(2)
     with g3:
         fig = px.histogram(x=resid, nbins=50, color_discrete_sequence=[ACCENT], title="殘差分布",
@@ -586,11 +586,17 @@ with tabs[4]:
     vif = vif.sort_values("VIF", ascending=False)
     sk, ku = stats.skew(resid), stats.kurtosis(resid)
     dw = sm.stats.stattools.durbin_watson(ols.resid)
+    from statsmodels.stats.diagnostic import het_breuschpagan
+    bp_n = min(20000, len(ols.resid))
+    bp_idx = np.random.default_rng(seed).choice(len(ols.resid), size=bp_n, replace=False)
+    bp_p = het_breuschpagan(np.asarray(ols.resid)[bp_idx], ols.model.exog[bp_idx])[1]
     diag = pd.DataFrame([
         ["線性", "殘差 vs 預測值", "殘差應隨機分布在 0 附近、無明顯曲線"],
-        ["殘差平均為 0", f"{resid.mean():.6g}", "接近 0 ✓" if abs(resid.mean()) < 0.1 * resid.std() else "偏離 0"],
+        ["殘差平均為 0", f"{resid.mean():.6g}", "接近 0 ✓" if abs(resid.mean()) < 2 * resid.std(ddof=1) / np.sqrt(len(resid)) else "偏離 0（超過 2 個標準誤）"],
         ["常態性", f"偏態 {sk:.3f}、超額峰度 {ku:.3f}", "接近常態 ✓" if abs(sk) < 1 and abs(ku) < 3 else "偏離常態，需留意"],
         ["誤差獨立", f"Durbin-Watson = {dw:.3f}", "約 2 表示無自相關 ✓" if 1.5 < dw < 2.5 else "可能有自相關"],
+        ["變異數同質（等變異性）", f"Breusch-Pagan p-value = {bp_p:.3g}",
+         "p ≥ 0.05，等變異 ✓" if bp_p >= 0.05 else "p < 0.05，有異質變異（樣本數很大時容易顯著，請搭配殘差圖判斷）"],
         ["無多重共線性", f"最大 VIF = {vif['VIF'].max():.3f}", "VIF < 5 ✓" if vif["VIF"].max() < 5 else "VIF ≥ 5，有共線性"],
     ], columns=["假設", "檢查結果", "判讀"])
     d1, d2 = st.columns([3, 2])
@@ -664,5 +670,8 @@ with tabs[6]:
         f"- [ChatGPT 對話紀錄（PDF）]({REPO}/blob/main/docs/GPT_conversation.pdf)\n"
         f"- [NotebookLM 研究摘要（PDF）]({REPO}/blob/main/docs/NotebookLM_summary.pdf)\n"
         f"- [完整報告（PDF）]({REPO}/blob/main/docs/5115056015_hw2_report.pdf)\n"
-        f"- [Colab Notebook（完整 111 萬筆資料）]({REPO}/blob/main/5115056015_hw2.ipynb)"
+        f"- [Colab Notebook（完整 111 萬筆資料）]({REPO}/blob/main/5115056015_hw2.ipynb)\n"
+        f"- [資訊圖表（PNG）]({REPO}/blob/main/images/infographic.png)"
     )
+    st.subheader("資訊圖表")
+    st.image("https://raw.githubusercontent.com/EasyBoy5566/AIoT-HW2/main/images/infographic.png")

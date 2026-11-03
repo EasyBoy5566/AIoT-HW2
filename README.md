@@ -5,7 +5,6 @@
 | 連結 | 網址 |
 |---|---|
 | 🌐 **Web（GitHub Pages）** | **https://easyboy5566.github.io/AIoT-HW2/** |
-| 🌐 Web 備用（Streamlit Cloud） | https://aiot-hw2-5115056015.streamlit.app |
 | 💻 GitHub | https://github.com/EasyBoy5566/AIoT-HW2 |
 | 📓 Colab Notebook | https://colab.research.google.com/drive/10A_C9AQGlzaIKCIm9_LQPGAfKkzCIAzJ?usp=sharing |
 | 📊 Kaggle 資料集 | https://www.kaggle.com/competitions/playground-series-s4e5 |
@@ -36,6 +35,12 @@
 
 ---
 
+## 資訊圖表
+
+![資訊圖表](images/infographic.png)
+
+---
+
 ## 兩種 Problem
 
 | | Problem 1：洪水機率預測 | Problem 2：新創公司利潤預測 |
@@ -55,7 +60,7 @@
 4. **Modeling**
    - **Feature Selection**：比較 SelectKBest（f_regression）、RFE（LinearRegression）、LassoCV，不同 k 值的 5-fold CV R²，以 **1-SE 規則**自動推薦特徵組合（也可手動選方法與 k）
    - **模型**：LinearRegression、Ridge（RidgeCV）、Lasso（LassoCV）、statsmodels OLS（係數、p-value、95% 係數信賴區間）
-5. **Evaluation**：MAE、MSE、RMSE、R²、Adjusted R²；**預測圖加 95% 信賴區間與預測區間**；實際 vs 預測、殘差圖、殘差分布、Q-Q Plot、Durbin-Watson、VIF
+5. **Evaluation**：MAE、MSE、RMSE、R²、Adjusted R²；**預測圖加 95% 信賴區間與預測區間**；實際 vs 預測、殘差圖、殘差分布、Q-Q Plot；五大回歸假設檢查（線性、殘差平均為 0／常態性、Durbin-Watson 獨立性、Breusch-Pagan 等變異性、VIF 共線性）
 6. **Deployment**：輸入特徵值即時預測（附 95% CI 與 PI），可下載測試集預測結果 CSV
 7. **網路解法與 AI 輔助**：網路主流解法比較、NotebookLM 摘要、GPT 輔助內容
 
@@ -118,13 +123,13 @@ AIoT-HW2/
 │   ├── 5115056015_hw2_report.pdf   # 完整報告（含 GPT 對話附錄）
 │   ├── GPT_conversation.pdf        # ChatGPT 對話紀錄
 │   └── NotebookLM_summary.pdf      # NotebookLM 研究摘要
-└── images/                         # README 截圖
+└── images/                         # 資訊圖表與 README 截圖
 ```
 
 ## 網頁部署方式
 
 - **GitHub Pages**：`index.html` 使用 [stlite](https://github.com/whitphx/stlite)（Pyodide）在瀏覽器中執行同一份 `app.py`，不需要伺服器。第一次開啟需下載 Python 執行環境（約 20～60 秒）；瀏覽器版的洪水資料再抽樣為 20,000 筆以加快運算；自訂 Dataset 只能讀取允許跨網域存取（CORS）的網址，例如 `raw.githubusercontent.com`，也可直接上傳 CSV。
-- **Streamlit Cloud（備用）**：在 share.streamlit.io 以本 repo 的 `app.py` 部署。
+- **Streamlit（本機或 Streamlit Cloud）**：同一份 `app.py` 也可用 `streamlit run app.py` 執行，或在 share.streamlit.io 部署。
 
 ## 本機執行
 
